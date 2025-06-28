@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -46,6 +47,8 @@ func main() {
 		case "6":
 			taskList.ShowDetailedProgress()
 		case "7":
+			setDueDateFlow(taskList, scanner)
+		case "8":
 			fmt.Println("💾 Saving tasks...")
 			err := taskList.SaveToFile()
 			if err != nil {
@@ -54,7 +57,6 @@ func main() {
 				fmt.Println("💾 Tasks saved successfully!")
 			}
 			return
-
 		default:
 			fmt.Println("❌ Invalid option! Type a number between 1 and 5.")
 		}
@@ -71,19 +73,38 @@ func showMenu() {
 	fmt.Println("4. 🗑️ Remove task")
 	fmt.Println("5. 📊 Show progress")
 	fmt.Println("6. 📈 Show detailed progress")
-	fmt.Println("7. 💾 Save and exit")
+	fmt.Println("7. 📅 Set due date")
+	fmt.Println("8. 💾 Save and exit")
 }
 
 func addTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
 	fmt.Print("Type the task description: ")
 	if scanner.Scan() {
 		description := strings.TrimSpace(scanner.Text())
-		if description != "" {
-			taskList.AddTask(description)
-			// Save tasks to file
-			taskList.SaveToFile()
-		} else {
+		if description == "" {
 			fmt.Println("❌ Description cannot be empty!")
+			return
+		}
+
+		fmt.Print("Type the task category: ")
+		if scanner.Scan() {
+			category := strings.TrimSpace(scanner.Text())
+			if category == "" {
+				fmt.Println("❌ Category cannot be empty!")
+				return
+			}
+
+			fmt.Print("Type the task priority: ")
+			if scanner.Scan() {
+				priority := strings.TrimSpace(scanner.Text())
+				if priority == "" {
+					fmt.Println("❌ Priority cannot be empty!")
+					return
+				}
+
+				taskList.AddTask(description, category, priority)
+				taskList.SaveToFile()
+			}
 		}
 	}
 }
@@ -123,5 +144,38 @@ func removeTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
 		} else {
 			taskList.SaveToFile()
 		}
+	}
+}
+
+func setDueDateFlow(taskList *TaskList, scanner *bufio.Scanner) {
+	fmt.Print("Type the ID of the task to set the due date: ")
+	var id int
+	var err error
+	if scanner.Scan() {
+		idStr := strings.TrimSpace(scanner.Text())
+		id, err = strconv.Atoi(idStr)
+		if err != nil {
+			fmt.Println("❌ Invalid ID! Type a number.")
+			return
+		}
+	}
+
+	fmt.Print("Type the due date (YYYY-MM-DD): ")
+	var dueDate time.Time
+	if scanner.Scan() {
+		dueDateStr := strings.TrimSpace(scanner.Text())
+		dueDate, err = time.Parse("2006-01-02", dueDateStr)
+		if err != nil {
+			fmt.Println("❌ Invalid date format! Use YYYY-MM-DD.")
+			return
+		}
+	}
+
+	err = taskList.SetDueDate(id, dueDate)
+	if err != nil {
+		fmt.Printf("❌ Error: %v\n", err)
+	} else {
+		fmt.Println("✅ Due date set successfully!")
+		taskList.SaveToFile()
 	}
 }

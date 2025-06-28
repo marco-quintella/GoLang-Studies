@@ -9,9 +9,12 @@ import (
 type Task struct {
 	ID          int        `json:"id"`
 	Description string     `json:"description"`
+	Category    string     `json:"category"`
+	Priority    string     `json:"priority"`
 	Completed   bool       `json:"completed"`
 	CreatedAt   time.Time  `json:"created_at"`
 	CompletedAt *time.Time `json:"completed_at"`
+	DueDate     *time.Time `json:"due_date"`
 }
 
 // Task list
@@ -27,10 +30,12 @@ func NewTaskList() *TaskList {
 	}
 }
 
-func (tl *TaskList) AddTask(description string) {
+func (tl *TaskList) AddTask(description string, category string, priority string) {
 	task := Task{
 		ID:          tl.NextID,
 		Description: description,
+		Category:    category,
+		Priority:    priority,
 		Completed:   false,
 		CreatedAt:   time.Now(),
 	}
@@ -84,13 +89,34 @@ func (tl *TaskList) ListTasks() {
 
 		if task.Completed {
 			Colors.Complete.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+			// Category
+			fmt.Printf("    Category: %s\n", task.Category)
+			fmt.Printf("    Priority: %s\n", task.Priority)
 			fmt.Printf("    Created at: %s\n", task.CreatedAt.Format("02/01/2006 15:04"))
+			if task.DueDate != nil {
+				fmt.Printf("    Due date: %s\n", task.DueDate.Format("02/01/2006"))
+			}
 			fmt.Printf("    Completed at: %s\n", task.CompletedAt.Format("02/01/2006 15:04"))
 		} else {
 			Colors.Pending.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+			fmt.Printf("    Category: %s\n", task.Category)
+			fmt.Printf("    Priority: %s\n", task.Priority)
 			fmt.Printf("    Created at: %s\n", task.CreatedAt.Format("02/01/2006 15:04"))
+			if task.DueDate != nil {
+				fmt.Printf("    Due date: %s\n", task.DueDate.Format("02/01/2006"))
+			}
 		}
 
 		fmt.Println("===================")
 	}
+}
+
+func (tl *TaskList) SetDueDate(id int, dueDate time.Time) error {
+	for i := range tl.Tasks {
+		if tl.Tasks[i].ID == id {
+			tl.Tasks[i].DueDate = &dueDate
+			return nil
+		}
+	}
+	return fmt.Errorf("task with ID %d not found", id)
 }

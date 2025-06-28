@@ -42,6 +42,10 @@ func main() {
 		case "4":
 			removeTaskFlow(taskList, scanner)
 		case "5":
+			taskList.ShowProgress()
+		case "6":
+			taskList.ShowDetailedProgress()
+		case "7":
 			fmt.Println("💾 Saving tasks...")
 			err := taskList.SaveToFile()
 			if err != nil {
@@ -50,6 +54,7 @@ func main() {
 				fmt.Println("💾 Tasks saved successfully!")
 			}
 			return
+
 		default:
 			fmt.Println("❌ Invalid option! Type a number between 1 and 5.")
 		}
@@ -63,8 +68,10 @@ func showMenu() {
 	fmt.Println("1. ➕ Add task")
 	fmt.Println("2. 📝 List tasks")
 	fmt.Println("3. ✅ Mark as completed")
-	fmt.Println("4. 🗑️  Remove task")
-	fmt.Println("5. 💾 Save and exit")
+	fmt.Println("4. 🗑️ Remove task")
+	fmt.Println("5. 📊 Show progress")
+	fmt.Println("6. 📈 Show detailed progress")
+	fmt.Println("7. 💾 Save and exit")
 }
 
 func addTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {

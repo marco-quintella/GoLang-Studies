@@ -82,12 +82,15 @@ func (tl *TaskList) ListTasks() {
 			status = "✅ Completed"
 		}
 
-		fmt.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
-		fmt.Printf("    Created at: %s\n", task.CreatedAt.Format("02/01/2006 15:04"))
-
-		if task.Completed && task.CompletedAt != nil {
+		if task.Completed {
+			Colors.Complete.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+			fmt.Printf("    Created at: %s\n", task.CreatedAt.Format("02/01/2006 15:04"))
 			fmt.Printf("    Completed at: %s\n", task.CompletedAt.Format("02/01/2006 15:04"))
+		} else {
+			Colors.Pending.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+			fmt.Printf("    Created at: %s\n", task.CreatedAt.Format("02/01/2006 15:04"))
 		}
+
 		fmt.Println("===================")
 	}
 }

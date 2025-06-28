@@ -29,7 +29,47 @@
       "created_at": "2025-06-27T23:30:36.591693-03:00",
       "completed_at": "2025-06-27T23:30:47.168056-03:00",
       "due_date": "2025-03-25T00:00:00Z"
+    },
+    {
+      "id": 4,
+      "description": "Another Task",
+      "category": "Simple",
+      "priority": "Low",
+      "completed": false,
+      "created_at": "2025-06-28T01:00:56.230771-03:00",
+      "completed_at": null,
+      "due_date": null
+    },
+    {
+      "id": 5,
+      "description": "Test Task 1",
+      "category": "Work",
+      "priority": "High",
+      "completed": true,
+      "created_at": "2025-06-28T01:05:15.048275-03:00",
+      "completed_at": "2025-06-28T01:05:20.909088-03:00",
+      "due_date": null
+    },
+    {
+      "id": 6,
+      "description": "Test Task 2",
+      "category": "Testing",
+      "priority": "Medium",
+      "completed": false,
+      "created_at": "2025-06-28T01:05:27.867846-03:00",
+      "completed_at": null,
+      "due_date": null
+    },
+    {
+      "id": 7,
+      "description": "Test Task 3",
+      "category": "Testing",
+      "priority": "Low",
+      "completed": false,
+      "created_at": "2025-06-28T01:05:27.867855-03:00",
+      "completed_at": null,
+      "due_date": null
     }
   ],
-  "next_id": 4
+  "next_id": 8
 }

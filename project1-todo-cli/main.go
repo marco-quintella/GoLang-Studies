@@ -18,6 +18,7 @@ func main() {
 		taskList = NewTaskList()
 	}
 
+	commandManager := NewCommandManager()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	fmt.Println("🎯 TODO CLI - Task Manager")
@@ -35,11 +36,11 @@ func main() {
 
 		switch option {
 		case "1":
-			addTaskFlow(taskList, scanner)
+			addTaskFlow(taskList, commandManager, scanner)
 		case "2":
 			taskList.ListTasks()
 		case "3":
-			completeTaskFlow(taskList, scanner)
+			completeTaskFlow(taskList, commandManager, scanner)
 		case "4":
 			removeTaskFlow(taskList, scanner)
 		case "5":
@@ -51,6 +52,10 @@ func main() {
 		case "8":
 			searchTasksFlow(taskList, scanner)
 		case "9":
+			undoFlow(commandManager)
+		case "10":
+			redoFlow(commandManager)
+		case "11":
 			fmt.Println("💾 Saving tasks...")
 			err := taskList.SaveToFile()
 			if err != nil {
@@ -77,10 +82,12 @@ func showMenu() {
 	fmt.Println("6. 📈 Show detailed progress")
 	fmt.Println("7. 📅 Set due date")
 	fmt.Println("8. � Search tasks")
-	fmt.Println("9. �💾 Save and exit")
+	fmt.Println("9. 🔄 Undo last action")
+	fmt.Println("10. � Redo last action")
+	fmt.Println("11. �💾 Save and exit")
 }
 
-func addTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
+func addTaskFlow(taskList *TaskList, cmdManager *CommandManager, scanner *bufio.Scanner) {
 	fmt.Print("Type the task description: ")
 	if scanner.Scan() {
 		description := strings.TrimSpace(scanner.Text())
@@ -105,14 +112,19 @@ func addTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
 					return
 				}
 
-				taskList.AddTask(description, category, priority)
-				taskList.SaveToFile()
+				cmd := NewAddTaskCommand(taskList, description, category, StringToPriority(priority))
+				err := cmdManager.Execute(cmd)
+				if err != nil {
+					fmt.Printf("❌ Error: %v\n", err)
+				} else {
+					taskList.SaveToFile()
+				}
 			}
 		}
 	}
 }
 
-func completeTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
+func completeTaskFlow(taskList *TaskList, cmdManager *CommandManager, scanner *bufio.Scanner) {
 	fmt.Print("Type the ID of the task to mark as completed: ")
 	if scanner.Scan() {
 		idStr := strings.TrimSpace(scanner.Text())
@@ -122,7 +134,9 @@ func completeTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
 			return
 		}
 
-		err = taskList.CompleteTask(id)
+		cmd := NewCompleteTaskCommand(taskList, id)
+
+		err = cmdManager.Execute(cmd)
 		if err != nil {
 			fmt.Printf("❌ Error: %v\n", err)
 		} else {
@@ -257,5 +271,23 @@ func searchByStatusFlow(taskList *TaskList, scanner *bufio.Scanner) {
 			}
 			Colors.Pending.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
 		}
+	}
+}
+
+func undoFlow(cmdManager *CommandManager) {
+	err := cmdManager.Undo()
+	if err != nil {
+		fmt.Printf("❌ Error: %v\n", err)
+	} else {
+		fmt.Println("✅ Undo successful!")
+	}
+}
+
+func redoFlow(cmdManager *CommandManager) {
+	err := cmdManager.Redo()
+	if err != nil {
+		fmt.Printf("❌ Error: %v\n", err)
+	} else {
+		fmt.Println("✅ Redo successful!")
 	}
 }

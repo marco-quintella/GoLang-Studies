@@ -1,0 +1,26 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "description": "My First Task",
+      "completed": false,
+      "created_at": "2025-06-27T23:30:21.224054-03:00",
+      "completed_at": null
+    },
+    {
+      "id": 2,
+      "description": "My Second Task",
+      "completed": false,
+      "created_at": "2025-06-27T23:30:32.190047-03:00",
+      "completed_at": null
+    },
+    {
+      "id": 3,
+      "description": "My Complete Task",
+      "completed": true,
+      "created_at": "2025-06-27T23:30:36.591693-03:00",
+      "completed_at": "2025-06-27T23:30:47.168056-03:00"
+    }
+  ],
+  "next_id": 4
+}

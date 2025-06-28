@@ -49,6 +49,8 @@ func main() {
 		case "7":
 			setDueDateFlow(taskList, scanner)
 		case "8":
+			searchTasksFlow(taskList, scanner)
+		case "9":
 			fmt.Println("💾 Saving tasks...")
 			err := taskList.SaveToFile()
 			if err != nil {
@@ -74,7 +76,8 @@ func showMenu() {
 	fmt.Println("5. 📊 Show progress")
 	fmt.Println("6. 📈 Show detailed progress")
 	fmt.Println("7. 📅 Set due date")
-	fmt.Println("8. 💾 Save and exit")
+	fmt.Println("8. � Search tasks")
+	fmt.Println("9. �💾 Save and exit")
 }
 
 func addTaskFlow(taskList *TaskList, scanner *bufio.Scanner) {
@@ -177,5 +180,82 @@ func setDueDateFlow(taskList *TaskList, scanner *bufio.Scanner) {
 	} else {
 		fmt.Println("✅ Due date set successfully!")
 		taskList.SaveToFile()
+	}
+}
+
+func searchTasksFlow(taskList *TaskList, scanner *bufio.Scanner) {
+	fmt.Println("🔍 Search tasks:")
+	fmt.Println("1. By name")
+	fmt.Println("2. By status")
+	fmt.Print("Choose an option: ")
+	if scanner.Scan() {
+		option := strings.TrimSpace(scanner.Text())
+		if option == "1" {
+			searchByNameFlow(taskList, scanner)
+		} else if option == "2" {
+			searchByStatusFlow(taskList, scanner)
+		} else {
+			fmt.Println("❌ Invalid option! Type 1 or 2.")
+			return
+		}
+	}
+}
+
+func searchByNameFlow(taskList *TaskList, scanner *bufio.Scanner) {
+	fmt.Print("Type the search query: ")
+	if scanner.Scan() {
+		query := strings.TrimSpace(scanner.Text())
+		results := taskList.SearchTasks(query)
+		if len(results) == 0 {
+			fmt.Println("🔍 No tasks found")
+			return
+		}
+
+		fmt.Println("🔍 Search results:")
+		fmt.Println("===================")
+		for _, task := range results {
+			status := "❌ Pending"
+			if task.Completed {
+				status = "✅ Completed"
+			}
+			Colors.Pending.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+			fmt.Printf("    Category: %s\n", task.Category)
+		}
+		fmt.Println("===================")
+	}
+}
+
+func searchByStatusFlow(taskList *TaskList, scanner *bufio.Scanner) {
+	fmt.Println("🔍 Search by status:")
+	fmt.Println("1. ✅ Completed")
+	fmt.Println("2. ❌ Pending")
+	fmt.Print("Choose an option: ")
+	if scanner.Scan() {
+		option := strings.TrimSpace(scanner.Text())
+
+		var results []Task
+		if option == "1" {
+			results = taskList.SearchByStatus(true)
+			fmt.Println("Completed tasks:")
+		} else if option == "2" {
+			results = taskList.SearchByStatus(false)
+			fmt.Println("Pending tasks:")
+		} else {
+			fmt.Println("❌ Invalid option! Type 1 or 2.")
+			return
+		}
+
+		if len(results) == 0 {
+			fmt.Println("🔍 No tasks found")
+			return
+		}
+
+		for _, task := range results {
+			status := "❌ Pending"
+			if task.Completed {
+				status = "✅ Completed"
+			}
+			Colors.Pending.Printf("[%d] %s - %s\n", task.ID, task.Description, status)
+		}
 	}
 }
